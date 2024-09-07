@@ -1,0 +1,76 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Standalone (Mac)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/plugin/WavingPlugin_artefacts/Debug/Standalone/WavingPlugin.app/Contents/MacOS/WavingPlugin",
+            "args": [], 
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "$PATH:${command:cmake.launchTargetDirectory}"
+                }
+            ],
+            "MIMode": "lldb",
+            "logging": {
+              "moduleLoad": false
+            },
+        },
+        {
+            "name": "C++ Launch (Windows)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\build\\plugin\\WavingPlugin_artefacts\\Debug\\Standalone\\WavingPlugin.exe",
+            "symbolSearchPath": "C:\\Symbols;C:\\SymbolDir2",
+            "externalConsole": true,
+            "cwd": "${workspaceFolder}",
+            "logging": {
+              "moduleLoad": false,
+              "trace": true
+            },
+            "visualizerFile": "${workspaceFolder}/my.natvis",
+            
+        },
+        {
+            "name": "Test 1 (Windows)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\build\\test\\Debug\\test_1.exe",
+            "symbolSearchPath": "C:\\Symbols;C:\\SymbolDir2",
+            "externalConsole": true,
+            "cwd": "${workspaceFolder}",
+            "logging": {
+              "moduleLoad": false,
+              "trace": true
+            },
+            "visualizerFile": "${workspaceFolder}/my.natvis",  
+        },
+        {
+            "name": "Test 1 (Mac)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test/test_1",
+            "args": [], 
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "$PATH:${command:cmake.launchTargetDirectory}"
+                }
+            ],
+            "MIMode": "lldb",
+            "logging": {
+              "moduleLoad": false
+            },
+        },
+    ]
+}
+

@@ -1,0 +1,6 @@
+# JUCE stuff
+Builds/
+JuceLibraryCode/
+build/
+libs/
+.cache/
