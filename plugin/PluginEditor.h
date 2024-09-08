@@ -27,6 +27,9 @@ public:
         
     // Controls
     void buttonClicked(juce::Button*) override;
+
+    void printWaveData();
+
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
@@ -36,6 +39,7 @@ private:
     juce::AudioFormatManager formatManager;
 
     juce::TextButton openButton;
+    juce::Label waveDataText;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WavingAudioProcessorEditor)

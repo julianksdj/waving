@@ -50,6 +50,8 @@ target_sources(${PROJECT_NAME}
         PluginProcessor.cpp
         PluginEditor.h
         PluginProcessor.h
+        WaveData.h
+        WaveData.cpp
 )
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer

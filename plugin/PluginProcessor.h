@@ -14,6 +14,8 @@
 #include <juce_audio_formats/juce_audio_formats.h>
 #include <juce_audio_devices/juce_audio_devices.h>
 
+#include "WaveData.h"
+
 //==============================================================================
 /**
 */
@@ -57,13 +59,17 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     void pushBufferToWaveform (juce::AudioBuffer<float>& buffer);
-    void pushAudioSourceToWaveform(juce::AudioFormatReaderSource *readerSource);
+    void loadAudioFile(juce::AudioFormatReaderSource *readerSource);
 
     juce::AudioVisualiserComponent waveformView;
     juce::AudioTransportSource transportSource;
 
+    WaveData getWaveData() { return waveData; };
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WavingAudioProcessor)
+
+    WaveData waveData;
     
 };

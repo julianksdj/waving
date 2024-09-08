@@ -97,6 +97,7 @@ void WavingAudioProcessor::changeProgramName (int index, const juce::String& new
 void WavingAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     transportSource.prepareToPlay(samplesPerBlock, sampleRate);
+    waveData = WaveData((float) sampleRate);
 }
 
 void WavingAudioProcessor::releaseResources()
@@ -181,10 +182,16 @@ void WavingAudioProcessor::pushBufferToWaveform (juce::AudioBuffer<float>& buffe
     waveformView.pushBuffer(buffer);
 }
 
-void WavingAudioProcessor::pushAudioSourceToWaveform(juce::AudioFormatReaderSource* readerSource) {
+void WavingAudioProcessor::loadAudioFile(juce::AudioFormatReaderSource* readerSource) {
     int size = (int) readerSource->getTotalLength();
     juce::AudioBuffer<float> buffer(1, size); //readerSource.getTotalLength()
     juce::AudioSourceChannelInfo info(&buffer, 0, size);
     readerSource->getNextAudioBlock(info);
+
+    // print buffer to waveform
     waveformView.pushBuffer(buffer);
+
+    // calculate data from waveform
+    waveData.calculateWaveData(buffer);
+     
 }
