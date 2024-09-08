@@ -182,9 +182,9 @@ void WavingAudioProcessor::pushBufferToWaveform (juce::AudioBuffer<float>& buffe
     waveformView.pushBuffer(buffer);
 }
 
-void WavingAudioProcessor::loadAudioFile(juce::AudioFormatReaderSource* readerSource) {
+void WavingAudioProcessor::loadAudioFile() {
     int size = (int) readerSource->getTotalLength();
-    juce::AudioBuffer<float> buffer(1, size); //readerSource.getTotalLength()
+    juce::AudioBuffer<float> buffer(1, size);
     juce::AudioSourceChannelInfo info(&buffer, 0, size);
     readerSource->getNextAudioBlock(info);
 
@@ -194,4 +194,10 @@ void WavingAudioProcessor::loadAudioFile(juce::AudioFormatReaderSource* readerSo
     // calculate data from waveform
     waveData.calculateWaveData(buffer);
      
+}
+
+
+void WavingAudioProcessor::initReaderSource(juce::AudioFormatReader *reader) {
+    auto newSource = std::make_unique<juce::AudioFormatReaderSource> (reader, true);
+    readerSource.reset (newSource.release());
 }

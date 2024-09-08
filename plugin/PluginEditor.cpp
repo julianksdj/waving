@@ -102,7 +102,8 @@ void WavingAudioProcessorEditor::buttonClicked(juce::Button *button) {
                     //playButton.setEnabled (true);
                     //audioProcessor.readerSource.reset (newSource.release());
                     juce::AudioFormatReaderSource readerSource(reader, true);
-                    audioProcessor.loadAudioFile(&readerSource);
+                    audioProcessor.initReaderSource(reader);
+                    audioProcessor.loadAudioFile();
                     printWaveData();
                 }
             }
