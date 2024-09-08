@@ -18,10 +18,9 @@ WavingAudioProcessor::WavingAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), waveformView(1)
+                       )
 {
-    waveformView.setRepaintRate(30);
-    waveformView.setBufferSize(256);
+
 }
 
 WavingAudioProcessor::~WavingAudioProcessor()
@@ -96,7 +95,7 @@ void WavingAudioProcessor::changeProgramName (int index, const juce::String& new
 //==============================================================================
 void WavingAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    transportSource.prepareToPlay(samplesPerBlock, sampleRate);
+    juce::ignoreUnused (samplesPerBlock);
     waveData = WaveData((float) sampleRate);
 }
 
@@ -104,7 +103,6 @@ void WavingAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
-    transportSource.releaseResources();
 }
 
 bool WavingAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -178,26 +176,17 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new WavingAudioProcessor();
 }
 
-void WavingAudioProcessor::pushBufferToWaveform (juce::AudioBuffer<float>& buffer) {
-    waveformView.pushBuffer(buffer);
-}
-
-void WavingAudioProcessor::loadAudioFile() {
-    int size = (int) readerSource->getTotalLength();
+void WavingAudioProcessor::initWaveVector(juce::AudioFormatReaderSource& readerSource) {
+    int size = (int) readerSource.getTotalLength();
+    waveData.length_samples = size;
     juce::AudioBuffer<float> buffer(1, size);
-    juce::AudioSourceChannelInfo info(&buffer, 0, size);
-    readerSource->getNextAudioBlock(info);
+    juce::AudioSourceChannelInfo info(buffer);
+    readerSource.getNextAudioBlock(info);
 
-    // print buffer to waveform
-    waveformView.pushBuffer(buffer);
-
-    // calculate data from waveform
+    const float *readPointer = buffer.getReadPointer(0);
+    waveVector.clear();
+    for (int i = 0; i < size; i++) {
+        waveVector.push_back(readPointer[i]);
+    }
     waveData.calculateWaveData(buffer);
-     
-}
-
-
-void WavingAudioProcessor::initReaderSource(juce::AudioFormatReader *reader) {
-    auto newSource = std::make_unique<juce::AudioFormatReaderSource> (reader, true);
-    readerSource.reset (newSource.release());
 }

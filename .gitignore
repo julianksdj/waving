@@ -4,3 +4,4 @@ JuceLibraryCode/
 build/
 libs/
 .cache/
+.vscode/settings.json

@@ -58,18 +58,15 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void pushBufferToWaveform (juce::AudioBuffer<float>& buffer);
-    void loadAudioFile(juce::AudioFormatReaderSource *readerSource);
-
-    juce::AudioVisualiserComponent waveformView;
-    juce::AudioTransportSource transportSource;
 
     WaveData getWaveData() { return waveData; };
+    void initWaveVector(juce::AudioFormatReaderSource& readerSource);
+
+    std::vector<float> waveVector;
 
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WavingAudioProcessor)
 
     WaveData waveData;
-    
 };
