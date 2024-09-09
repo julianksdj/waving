@@ -51,13 +51,13 @@ private:
     const int TOP_BUTTONS_W = 100;
     const int TOP_BUTTONS_H = 30;
     const int ZOOM_X = 2 * MARGIN + TOP_BUTTONS_W;
-    const int WAVEFORM_Y = TOP_BUTTONS_Y + TOP_BUTTONS_W + MARGIN;
+    const int WAVEFORM_Y = TOP_BUTTONS_Y + TOP_BUTTONS_H + MARGIN;
     const int WAVEFORM_H = 300;
     const int DATA_Y = WAVEFORM_Y + WAVEFORM_H + MARGIN;
     const int DATA_X = MARGIN;
     const int DATA_W = 600;
     const int DATA_H = 300;
-    const int WAVEFORM_CENTER_Y = MARGIN * 2 + TOP_BUTTONS_Y + 150;
+    const int WAVEFORM_CENTER_Y = MARGIN + TOP_BUTTONS_Y + WAVEFORM_H / 2;
     int WINDOW_W = 700;
     int WINDOW_H = 700;
 

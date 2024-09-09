@@ -45,10 +45,14 @@ void WavingAudioProcessorEditor::paint(juce::Graphics& g)
     g.setColour(juce::Colours::white);
     g.setFont(15.0f);
 
+    juce::Path waveBoxPath;
+    juce::Rectangle waveBox(0, WAVEFORM_Y, getWidth(), WAVEFORM_H);
+    g.drawRect(waveBox);
+
     if (mShouldBePainting) {
         // from tutorial: https://youtu.be/VC4GCpvIIOE?si=WtLFdzmTSJ1ncj36
-        juce::Path p;
-        p.clear();
+        juce::Path waveformPath;
+        waveformPath.clear();
 
         std::vector<float> waveform = audioProcessor.waveVector;
         auto ratio = waveform.size() / getWidth();
@@ -59,15 +63,15 @@ void WavingAudioProcessorEditor::paint(juce::Graphics& g)
             mAudioPoints.push_back(waveform[sample]);
         }
 
-        p.startNewSubPath(0, (float) WAVEFORM_CENTER_Y);
+        waveformPath.startNewSubPath(0, (float) WAVEFORM_Y);
 
         // scale on y axis
         for (int sample = 0; sample < (int) mAudioPoints.size(); ++sample) {
-            auto point = juce::jmap<float>(mAudioPoints[sample], -1.0f, 1.0f, (float) WAVEFORM_H, (float) WAVEFORM_Y);
-            p.lineTo((float) sample, point);
+            auto point = juce::jmap<float>(mAudioPoints[sample], -1.0f, 1.0f, (float) WAVEFORM_H + WAVEFORM_Y, (float) WAVEFORM_Y);
+            waveformPath.lineTo((float) sample, point);
         }
 
-        g.strokePath(p, juce::PathStrokeType(2));
+        g.strokePath(waveformPath, juce::PathStrokeType(2));
 
         mShouldBePainting = false;
     }
