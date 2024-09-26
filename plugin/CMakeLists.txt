@@ -39,10 +39,12 @@ juce_add_plugin(${PROJECT_NAME}
     HARDENED_RUNTIME_OPTIONS com.apple.security.device.audio-input
 )        
 
-# target_include_directories(${PROJECT_NAME}
-#     PRIVATE
-#         include
-# )
+target_include_directories(${PROJECT_NAME}
+    # PRIVATE
+    #     include
+    PRIVATE
+    ${LIB_DIR}/fftw
+)
 
 target_sources(${PROJECT_NAME}
     PRIVATE
@@ -60,15 +62,6 @@ target_sources(${PROJECT_NAME}
 # need that's not on by default, check the module header for the correct flag to set here. These
 # definitions will be visible both to your code, and also the JUCE module code, so for new
 # definitions, pick unique names that are unlikely to collide! This is a standard CMake command.
-
-# target_compile_definitions(${PROJECT_NAME}
-#     PRIVATE
-#         # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
-#         JUCE_WEB_BROWSER=0  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_gui_app` call
-#         JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_gui_app` call
-#         JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:${PROJECT_NAME},JUCE_PRODUCT_NAME>"
-#         JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:${PROJECT_NAME},JUCE_VERSION>"
-# )
 
 target_compile_definitions(${PROJECT_NAME}
     PUBLIC
@@ -93,6 +86,12 @@ target_compile_definitions(${PROJECT_NAME}
 # linked automatically. If we'd generated a binary data target above, we would need to link to it
 # here too. This is a standard CMake command.
 
+
+# find_package(PkgConfig REQUIRED)
+# pkg_search_module(FFTW REQUIRED fftw3 IMPORTED_TARGET)
+# include_directories(PkgConfig::FFTW)
+# link_libraries(PkgConfig::FFTW)
+
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         # GuiAppData            # If we'd created a binary data target, we'd link to it here
@@ -110,7 +109,8 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
-        juce::juce_recommended_warning_flags        
+        juce::juce_recommended_warning_flags
+        ${LIB_DIR}/fftw/fftw3f.lib
 )
 
 # This needs to be set up only for your projects, not 3rd party

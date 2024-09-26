@@ -34,4 +34,31 @@ void WaveData::calculateWaveData(juce::AudioBuffer<float>& buffer) {
     DBG("Peak (dB SPL) = " << peak_db << " dB FS");
     DBG("Peak index = " << peak_idx);
     DBG("Peak time (seconds) = " << peak_time << " seconds");
+
+    //Spectrum
+    fftwf_complex* fft_out = fftwf_alloc_complex(sizeof(fftwf_complex) * FFT_SIZE);
+    size_t sizeread = sizeof(sizeof(float) * length_samples);
+    DBG("sizeof(readPointer)" << sizeread);
+    DBG("length_samples" << length_samples);
+    float* readPointer2 = new float[length_samples];
+    std::memcpy(readPointer2, readPointer, length_samples * sizeof(*readPointer2));
+    computeFft(FFT_SIZE, readPointer2, fft_out);
+    // calculate amp spectrum
+    for (int n = 0; n < FFT_SIZE; n++) {
+        float real = fft_out[0][n];
+        float imag = fft_out[1][n];
+        spectrum[n] = sqrtf(real * real + imag * imag) / length_samples;
+        // Double the amplitude spectrum values (except for DC component)
+        if (n != 0) {
+            spectrum[n] *= 2.f;
+        }
+    }
+    fftwf_free(fft_out);
+    delete[] readPointer2;
+}
+
+void WaveData::computeFft(int fft_size, float* input, fftwf_complex* output) {
+    fftwf_plan p = fftwf_plan_dft_r2c_1d(fft_size, input, output, FFTW_ESTIMATE);
+    fftwf_execute(p); /* repeat as needed */
+    fftwf_destroy_plan(p);
 }

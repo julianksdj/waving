@@ -57,7 +57,7 @@ void WavingAudioProcessorEditor::paint(juce::Graphics& g)
         waveformPath.clear();
 
         std::vector<float> waveform = audioProcessor.waveVector;
-        auto ratio = waveform.size() / getWidth();
+        int ratio = (int) waveform.size() / getWidth();
 
         mAudioPoints.clear();
         // scale audio file to window size. x axis
