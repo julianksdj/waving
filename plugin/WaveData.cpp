@@ -44,11 +44,12 @@ void WaveData::calculateWaveData(juce::AudioBuffer<float>& buffer) {
     std::memcpy(readPointer2, readPointer, length_samples * sizeof(*readPointer2));
     computeFft(FFT_SIZE, readPointer2, fft_out);
     // calculate amp spectrum
-    for (int n = 0; n < FFT_SIZE; n++) {
+    for (int n = 0; n < HALF_FFT_SIZE; n++) {
         float real = fft_out[0][n];
         float imag = fft_out[1][n];
-        spectrum[n] = sqrtf(real * real + imag * imag) / length_samples;
-        // Double the amplitude spectrum values (except for DC component)
+        float amplitude = sqrtf(real * real + imag * imag) / length_samples;
+        spectrum[n] = 10 * log10(abs(amplitude));
+        // double the amplitude spectrum values (except for DC component)
         if (n != 0) {
             spectrum[n] *= 2.f;
         }

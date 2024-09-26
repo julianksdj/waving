@@ -49,43 +49,59 @@ void WavingAudioProcessorEditor::paint(juce::Graphics& g)
     g.setColour(juce::Colours::white);
     g.setFont(15.0f);
 
+    // WAVEFORM
     juce::Rectangle waveBox(0, WAVEFORM_Y, getWidth(), WAVEFORM_H);
     g.drawRect(waveBox);
-
-    if (mShouldBePainting) {
-        // from tutorial: https://youtu.be/VC4GCpvIIOE?si=WtLFdzmTSJ1ncj36
+    if (shouldPaintWaveform) {
         waveformPath.clear();
-
-        std::vector<float> waveform = audioProcessor.waveVector;
-        int ratio = (int) waveform.size() / getWidth();
-
-        mAudioPoints.clear();
+        std::vector<float> waveform_vec = audioProcessor.waveVector;
+        int ratio = (int) waveform_vec.size() / getWidth();
+        waveformPoints.clear();
         // scale audio file to window size. x axis
-        for (int sample = 0; sample < (int) waveform.size(); sample+=ratio) {
-            mAudioPoints.push_back(waveform[sample]);
+        for (int sample = 0; sample < (int) waveform_vec.size(); sample+=ratio) {
+            waveformPoints.push_back(waveform_vec[sample]);
         }
-
         waveformPath.startNewSubPath(0, (float) WAVEFORM_CENTER_Y);
-
-        wavePoints.clear();
+        waveformCoordinates.clear();
         // scale on y axis
-        for (int sample = 0; sample < (int) mAudioPoints.size(); ++sample) {
-            auto point = juce::jmap<float>(mAudioPoints[sample], -1.0f, 1.0f, (float) WAVEFORM_H + WAVEFORM_Y, (float) WAVEFORM_Y);
+        for (int sample = 0; sample < (int) waveformPoints.size(); ++sample) {
+            auto point = juce::jmap<float>(waveformPoints[sample], -1.0f, 1.0f, (float) WAVEFORM_H + WAVEFORM_Y, (float) WAVEFORM_Y);
             waveformPath.lineTo((float) sample, point);
-            wavePoints.push_back(std::make_tuple(sample, point));
+            waveformCoordinates.push_back(std::make_tuple(sample, point));
         }
-
-        mShouldBePainting = false;
+        shouldPaintWaveform = false;
     }
-
     g.setColour(juce::Colours::green);
     g.strokePath(waveformPath, juce::PathStrokeType(2));
 
+    // SPECTRUM
+    g.setColour(juce::Colours::white);
+    juce::Rectangle spectrumBox(SPECTRUM_X, SPECTRUM_Y, SPECTRUM_W, SPECTRUM_H);
+    g.drawRect(spectrumBox);
+    if (shouldPaintSpectrum) {
+        spectrumPath.clear();
+        WaveData waveData = audioProcessor.getWaveData();
+        std::vector<float> spectrum_vec(waveData.spectrum, waveData.spectrum + 512);
+        spectrumPoints.clear();
+        for (int sample = 0; sample < (int) spectrum_vec.size(); sample++) {
+            spectrumPoints.push_back(spectrum_vec[sample]);
+        }
+        spectrumPath.startNewSubPath((float) SPECTRUM_X, (float) SPECTRUM_Y + SPECTRUM_H);
+        spectrumCoordinates.clear();
+        for (int sample = 0; sample < (int) spectrumPoints.size(); ++sample) {
+            auto point = juce::jmap<float>(spectrumPoints[sample], -160.f, 0.f, (float) SPECTRUM_H + SPECTRUM_Y, (float) SPECTRUM_Y);
+            spectrumPath.lineTo((float) sample + SPECTRUM_X, point);
+            spectrumCoordinates.push_back(std::make_tuple(sample, point));
+        }
+        shouldPaintSpectrum = false;
+    }
+    g.setColour(juce::Colours::blue);
+    g.strokePath(spectrumPath, juce::PathStrokeType(2));
+
+    // WAVEFORM POINTER
     if (shouldPaintPointer) {
-    // juce::Path pointerPath;
-        if (lastMousePosition.getX() >= 0.f && lastMousePosition.getX() <= wavePoints.size()) {
-            float y = std::get<1>(wavePoints[(int)lastMousePosition.getX()]);
-            //juce::Rectangle<float> pointerCircle(lastMousePosition.getX() - POINTER_SIZE / 2, lastMousePosition.getY() - POINTER_SIZE / 2, (float) POINTER_SIZE, (float) POINTER_SIZE);
+        if (lastMousePosition.getX() >= 0.f && lastMousePosition.getX() <= waveformCoordinates.size()) {
+            float y = std::get<1>(waveformCoordinates[(int)lastMousePosition.getX()]);
             juce::Rectangle<float> pointerCircle(lastMousePosition.getX() - POINTER_SIZE / 2, y - POINTER_SIZE / 2, (float) POINTER_SIZE, (float) POINTER_SIZE);
             g.setColour(juce::Colours::red);
             g.drawEllipse(pointerCircle, 1.0f);
@@ -99,7 +115,7 @@ void WavingAudioProcessorEditor::resized()
     openButton.setBounds(OPEN_X, TOP_BUTTONS_Y, TOP_BUTTONS_W, TOP_BUTTONS_H);
     zoomInButton.setBounds(ZOOM_X, TOP_BUTTONS_Y, TOP_BUTTONS_W, TOP_BUTTONS_H);
     waveDataText.setBounds(WAVE_DATA_X, WAVE_DATA_Y, WAVE_DATA_W, WAVE_DATA_H);
-    sampleDataText.setBounds(SAMPLE_DATA_X, SAMPLE_DATA_X, SAMPLE_DATA_W, SAMPLE_DATA_H);
+    sampleDataText.setBounds(SAMPLE_DATA_X, SAMPLE_DATA_Y, SAMPLE_DATA_W, SAMPLE_DATA_H);
 }
 
 void WavingAudioProcessorEditor::printWaveData () {
@@ -140,7 +156,8 @@ void WavingAudioProcessorEditor::buttonClicked(juce::Button *button) {
                     juce::AudioFormatReaderSource newSource(reader, true);
                     audioProcessor.initWaveVector(newSource);
 
-                    mShouldBePainting = true;
+                    shouldPaintWaveform = true;
+                    shouldPaintSpectrum = true;
                     repaint();
                     printWaveData ();
                     
@@ -164,7 +181,7 @@ void WavingAudioProcessorEditor::paintSampleData (const juce::MouseEvent& e)
     //if click inside waveform rectangle, show amplitude
     if (e.position.y <= WAVEFORM_Y + WAVEFORM_H && e.position.y >= WAVEFORM_Y && e.position.x >= 0 && e.position.x < getWidth()) {
         //amplitude = -2.f * ((e.position.y - WAVEFORM_Y) / (WAVEFORM_H) - 0.5f);
-        float y = std::get<1>(wavePoints[(int) e.position.x]);
+        float y = std::get<1>(waveformCoordinates[(int) e.position.x]);
         amplitude = -2.f * ((y  - WAVEFORM_Y) / (WAVEFORM_H) - 0.5f);
         float db = 20 * log10(abs(amplitude));
 

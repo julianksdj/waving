@@ -49,15 +49,17 @@ private:
     juce::Label sampleDataText;
     juce::TextButton zoomInButton;
 
-    std::vector<float> mAudioPoints;
-    bool mShouldBePainting { false };
+    std::vector<float> waveformPoints;
+    std::vector<float> spectrumPoints;
+    bool shouldPaintWaveform { false };
+    bool shouldPaintSpectrum { false };
     bool shouldPaintPointer { false };
 
     juce::Point<float> lastMousePosition;
     float amplitude;
 
     int WINDOW_W = 700;
-    int WINDOW_H = 700;
+    int WINDOW_H = 1100;
     const int MARGIN = 10;
     const int TOP_BUTTONS_Y = MARGIN;
     const int OPEN_X = MARGIN;
@@ -66,7 +68,11 @@ private:
     const int ZOOM_X = 2 * MARGIN + TOP_BUTTONS_W;
     const int WAVEFORM_Y = TOP_BUTTONS_Y + TOP_BUTTONS_H + MARGIN;
     const int WAVEFORM_H = 300;
-    const int WAVE_DATA_Y = WAVEFORM_Y + WAVEFORM_H + MARGIN;
+    const int SPECTRUM_Y = WAVEFORM_Y + WAVEFORM_H + MARGIN;
+    const int SPECTRUM_W = 512; // FFT size
+    const int SPECTRUM_X = (WINDOW_W - SPECTRUM_W) / 2;
+    const int SPECTRUM_H = 300;
+    const int WAVE_DATA_Y = SPECTRUM_Y + SPECTRUM_H + MARGIN;
     const int WAVE_DATA_X = MARGIN;
     const int WAVE_DATA_W = WINDOW_W / 2;
     const int WAVE_DATA_H = 300;
@@ -79,9 +85,11 @@ private:
 
     const int WAVEFORM_CENTER_Y = WAVEFORM_Y + WAVEFORM_H / 2;
 
-    std::vector<std::tuple<int, float>> wavePoints;
+    std::vector<std::tuple<int, float>> waveformCoordinates;
+    std::vector<std::tuple<int, float>> spectrumCoordinates;
 
     juce::Path waveformPath;
+    juce::Path spectrumPath;
     
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WavingAudioProcessorEditor)

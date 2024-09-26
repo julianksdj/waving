@@ -3,6 +3,7 @@
 #include <fftw3.h>
 
 #define FFT_SIZE 1024
+#define HALF_FFT_SIZE (FFT_SIZE >> 1)
 
 class WaveData
 {
@@ -20,7 +21,7 @@ class WaveData
     float peak_db;
     int peak_idx;
     float peak_time;
-    float spectrum[FFT_SIZE];  
+    float spectrum[HALF_FFT_SIZE];
 
     private:
     float sampleRate;
